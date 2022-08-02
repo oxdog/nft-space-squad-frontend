@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add Local font */
+/* @font-face {
+  font-family: 'FontName';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('public/fontpath');
+}*/

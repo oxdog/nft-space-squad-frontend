@@ -1,0 +1,112 @@
+{
+  "name": "spacesquad",
+  "version": "1.0.0",
+  "engines": {
+    "node": "16.13.1",
+    "npm": "8.12.1"
+  },
+  "author": {"name": "oxdog"},
+  "license": "MIT",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write ./src",
+    "gen": "graphql-codegen --config codegen.yml",
+    "compile": "typechain --target=ethers-v5 --out-dir src/types/generated 'src/contracts/*.json'",
+    "commit": "git-cz",
+    "release": "standard-version",
+    "pre-commit": "lint-staged",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.+(js|jsx|tsx|ts)": [
+      "eslint --fix",
+      "prettier --write --ignore-unknown"
+    ],
+    "*.+(json|css|md)": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "@emotion/react": "11.1.1",
+    "@emotion/styled": "11.0.0",
+    "@ethersproject/providers": "^5.5.3",
+    "@ethersproject/shims": "^5.5.0",
+    "@headlessui/react": "^1.4.0",
+    "@heroicons/react": "^1.0.2",
+    "@metamask/providers": "^8.1.1",
+    "@reduxjs/toolkit": "^1.7.1",
+    "@tailwindcss/aspect-ratio": "^0.2.1",
+    "@tailwindcss/line-clamp": "^0.2.1",
+    "@typechain/ethers-v5": "^9.0.0",
+    "@types/gtag.js": "^0.0.7",
+    "@walletconnect/ethereum-provider": "^1.6.0",
+    "@web3-react/authereum-connector": "^6.2.0",
+    "@web3-react/core": "^6.1.9",
+    "@web3-react/fortmatic-connector": "^6.1.6",
+    "@web3-react/frame-connector": "^6.0.9",
+    "@web3-react/injected-connector": "^6.0.7",
+    "@web3-react/lattice-connector": "^6.1.9",
+    "@web3-react/ledger-connector": "^6.1.9",
+    "@web3-react/magic-connector": "^6.1.9",
+    "@web3-react/network-connector": "^6.2.9",
+    "@web3-react/portis-connector": "^6.2.11",
+    "@web3-react/torus-connector": "^6.2.9",
+    "@web3-react/trezor-connector": "^6.1.9",
+    "@web3-react/walletconnect-connector": "6.2.8",
+    "@web3-react/walletlink-connector": "^6.2.11",
+    "axios": "^0.25.0",
+    "cloudinary-build-url": "^0.2.1",
+    "ethers": "^5.6.9",
+    "framer-motion": "^2.9.4",
+    "graphql": "^15.5.0",
+    "graphql-tag": "^2.11.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.31",
+    "moment": "^2.29.1",
+    "next": "^11.1.0",
+    "next-themes": "0.0.15",
+    "password-validator": "^5.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
+    "react-intersection-observer": "^8.32.0",
+    "react-is": "^17.0.1",
+    "react-redux": "^7.2.6",
+    "react-responsive-carousel": "^3.2.18",
+    "uuid": "^8.3.2",
+    "web3-react": "^5.0.5"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.20.1",
+    "@graphql-codegen/typescript": "1.20.2",
+    "@graphql-codegen/typescript-operations": "1.17.14",
+    "@graphql-codegen/typescript-urql": "^2.0.3",
+    "@types/node": "^14.6.0",
+    "@types/react": "^16.9.46",
+    "@types/react-dom": "^16.9.8",
+    "@types/uuid": "^8.3.4",
+    "autoprefixer": "^10.3.1",
+    "eslint": "^7.31.0",
+    "eslint-config-next": "^11.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "git-cz": "^4.7.6",
+    "husky": "^7.0.0",
+    "lint-staged": "^11.1.1",
+    "postcss": "^8.3.6",
+    "prettier": "^2.3.2",
+    "standard-version": "^9.3.1",
+    "tailwindcss": "^3.0.19",
+    "typechain": "^7.0.0",
+    "typescript": "4.3.5"
+  }
+}

@@ -1,0 +1,266 @@
+import { Layout } from '@components/Layout'
+import { MintNFTCard } from '@components/MintNFTCard'
+import { OpenSeaButton } from '@components/OpenSeaButton'
+import { useAppSelector } from '@data/hooks'
+import createWithApollo from '@utils/apollo/withApollo'
+import { getRandomLoadingMessage } from '@utils/getRandomLoadingMessage'
+import { delay } from '@utils/misc/delay'
+import { getTimeUntilUTCDate } from '@utils/misc/getTimeUntilUTCDate'
+import moment from 'moment'
+import Head from 'next/head'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+import { IoMdInformationCircle } from 'react-icons/io'
+
+const MintPage = () => {
+  const soldOut = useAppSelector((state) => state.saleData.soldOut)
+  const loading = useAppSelector((state) => state.saleData.loading)
+  const price = useAppSelector((state) => state.saleData.nftPrice)
+  const error = useAppSelector((state) => state.saleData.error)
+
+  const whitelistLeft = useAppSelector(
+    (state) => state.user.user?.whitelistLeft || 0
+  )
+  const freeMintLeft = useAppSelector((state) => state.user.user?.freeMintLeft || 0)
+
+  const [loadingMessage, setLoadingMessage] = useState<string>('Loading...')
+
+  const [months, setMonths] = useState<number>(0)
+  const [days, setDays] = useState<number>(0)
+  const [hours, setHours] = useState<number>(0)
+  const [minutes, setMinutes] = useState<number>(0)
+  const [seconds, setSeconds] = useState<number>(0)
+
+  const [pacemakerInit, setPacemakerInit] = useState<boolean>(false)
+  const [countdownRunning, setCountdownRunning] = useState<boolean>(false)
+  const [paceMaker, setPaceMaker] = useState<boolean>(false)
+
+  useEffect(() => {
+    const pacemakerClock = async () => {
+      let lastOne = paceMaker
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        setPaceMaker(!lastOne)
+        lastOne = !lastOne
+
+        await delay(1000)
+      }
+    }
+
+    if (!pacemakerInit) {
+      pacemakerClock()
+      setPacemakerInit(true)
+    }
+  }, [paceMaker, pacemakerInit])
+
+  useEffect(() => {
+    const [, months, days, hours, minutes, seconds] = getTimeUntilUTCDate(
+      whitelistLeft > 0 || freeMintLeft > 0
+        ? process.env.NEXT_PUBLIC_WHITELIST_DATE
+        : process.env.NEXT_PUBLIC_RELEASE_DATE
+    )
+
+    if (months > 0 || days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+      setMonths(months)
+      setDays(days)
+      setHours(hours)
+      setMinutes(minutes)
+      setSeconds(seconds)
+
+      setCountdownRunning(true)
+    } else {
+      setSeconds(0)
+
+      setCountdownRunning(false)
+    }
+  }, [whitelistLeft, freeMintLeft, paceMaker])
+
+  useEffect(() => {
+    if (loading) {
+      setLoadingMessage(getRandomLoadingMessage())
+    }
+  }, [loading])
+
+  const padString = (n: number) => ('0' + n.toString()).slice(-2, 3)
+
+  const drawError = () => <div className="z-20">{error}</div>
+
+  const drawLoading = () => (
+    <div className="font-bold animate-pulse text-3xl px-8 text-center">
+      {loadingMessage}
+    </div>
+  )
+
+  const drawMint = () => (
+    <div className="realtive flex flex-col items-center space-y-10 sm:space-y-16">
+      <MintNFTCard
+        price={price}
+        soldOut={soldOut && freeMintLeft == 0}
+        mintLimit={
+          moment.utc() < moment.utc(process.env.NEXT_PUBLIC_RELEASE_DATE)
+            ? whitelistLeft
+            : 5
+        }
+        usePreSale={false}
+      />
+
+      <div className="w-86">
+        <OpenSeaButton />
+      </div>
+
+      {whitelistLeft > 0 &&
+        moment.utc() < moment.utc(process.env.NEXT_PUBLIC_RELEASE_DATE) && (
+          <div className="flex flex-row items-center space-x-2 z-10">
+            <IoMdInformationCircle className="w-6 h-6 hidden lg:flex" />
+            <span className="flex flex-col items-center text-center px-2 lg:flex-row lg:space-x-1 text-lg lg:text-xl opacity-80">
+              You have
+              <span className="px-1 text-xl lg:text-2xl text-dmss-accent1-50">
+                {whitelistLeft + freeMintLeft} NFT 
+                {whitelistLeft + freeMintLeft > 1 ? 's' : ''} left to mint,
+              </span>
+              after that, the public sale will be displayed
+            </span>
+          </div>
+        )}
+    </div>
+  )
+
+  const drawCountDown = () => {
+    return (
+      <div className="flex flex-col items-center space-y-4 md:space-y-6 lg:space-y-10 font-extrabold z-20">
+        <div className="flex flex-col items-center md:flex-row md:items-end space-x-2">
+          <span className="text-4xl md:text-5xl lg:text-6xl text-dmss-accent1-100">
+            {whitelistLeft > 0 ? 'Whitelist Sale' : 'Public Sale'}
+          </span>
+          <span className="text-2xl md:text-3xl lg:text-4xl pb-0.5 md:hidden">
+            starts in
+          </span>
+          <div className="hidden md:flex flex-row space-x-2 items-end">
+            <span className="text-4xl pb-0.5">starts</span>
+            <span className="text-3xl pb-0.5">in</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col xl:flex-row xl:space-x-4">
+          {months > 0 && (
+            <div className="flex flex-row items-end space-x-1">
+              <span className="text-4xl md:text-6xl lg:text-7xl w-16 md:w-28 text-right">
+                {padString(months)}
+              </span>
+              {/* ? s */}
+              <span className="text-2xl lg:text-3xl pb-1 text-dmss-accent1-100">
+                month{!(months === 1) && 's'}
+              </span>
+            </div>
+          )}
+          {(days > 0 || months > 0) && (
+            <div className="flex flex-row items-end space-x-1">
+              <span className="text-4xl md:text-6xl lg:text-7xl w-16 md:w-28 text-right">
+                {padString(days)}
+              </span>
+              <span className="text-2xl md:text-3xl pb-1 text-dmss-accent1-100">
+                day{!(days === 1) && 's'}
+              </span>
+            </div>
+          )}
+          {(hours > 0 || days > 0 || months > 0) && (
+            <div className="flex flex-row items-end space-x-1">
+              <span className="text-4xl md:text-6xl lg:text-7xl w-16 md:w-28 text-right">
+                {padString(hours)}
+              </span>
+              <span className="text-2xl md:text-3xl pb-1 text-dmss-accent1-100">
+                hour{!(hours === 0) && 's'}
+              </span>
+            </div>
+          )}
+          {(minutes > 0 || hours > 0 || days > 0 || months > 0) && (
+            <div className="flex flex-row items-end space-x-1">
+              <span className="text-4xl md:text-6xl lg:text-7xl w-16 md:w-28 text-right">
+                {padString(minutes)}
+              </span>
+              <span className="text-2xl md:text-3xl pb-1 text-dmss-accent1-100">
+                minute{!(minutes === 1) && 's'}
+              </span>
+            </div>
+          )}
+          <div className="flex flex-row items-end space-x-1">
+            <div className="text-4xl md:text-6xl lg:text-7xl w-16 md:w-28 text-right">
+              {padString(seconds)}
+            </div>
+            <span className="text-2xl md:text-3xl pb-1 text-dmss-accent1-100">
+              second{!(seconds === 1) && 's'}
+            </span>
+          </div>
+        </div>
+        <span className="text-2xl px-2 text-center">
+          {moment
+            .utc(
+              whitelistLeft > 0
+                ? process.env.NEXT_PUBLIC_WHITELIST_DATE
+                : process.env.NEXT_PUBLIC_RELEASE_DATE
+            )
+            .format('MMMM Do YYYY, HH:mm')}
+          UTC
+        </span>
+
+        <div className="flex flex-row items-center text-center space-x-2 z-10 px-8">
+          <IoMdInformationCircle className="w-6 h-6 hidden lg:flex" />
+          <span className="text-lg md:text-xl opacity-80">
+            Connect your wallet if you are whitelisted. To check your Whitelist Spot
+            <Link href="/checkWhitelistSpot" passHref={true}>
+              <span className="underline cursor-pointer ml-1">click here</span>
+            </Link>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  // const drawComingSoon = () => {
+  //   return (
+  //     <div className="flex flex-col items-center space-y-4 md:space-y-6 lg:space-y-10 font-extrabold z-20">
+  //       <div className="flex flex-col items-center md:flex-row md:items-end space-x-2">
+  //         <span className="text-4xl md:text-5xl lg:text-6xl text-dmss-accent1-100">
+  //           Coming soon ...
+  //         </span>
+  //       </div>
+  //     </div>
+  //   )
+  // }
+
+  return (
+    <Layout showNav={false}>
+      <Head>
+        <title>⛏️ DMSS Minting ⛏️</title>
+        <meta
+          key="title"
+          property="og:title"
+          content="NFT  Space Squad Minting"
+        />
+        <meta
+          key="description"
+          property="og:description"
+          content="Want to join the NFT  Space Squad? You came to the right place! Mint your NFT here."
+        />
+        <meta key="robots" name="robots" content="index,follow" />
+      </Head>
+
+      <div className="flex justify-center items-center w-full h-full pt-20">
+        {countdownRunning
+          ? drawCountDown()
+          : // drawComingSoon()
+          loading
+          ? drawLoading()
+          : error
+          ? drawError()
+          : drawMint()}
+      </div>
+    </Layout>
+  )
+}
+
+export default createWithApollo({ ssr: false })(MintPage)
+
+// if loading -> draw loading
+// if countdown not 0 -> draw countdown
+// if !loading && countdown 0 -> draw mint

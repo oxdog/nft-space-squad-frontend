@@ -1,0 +1,12 @@
+overwrite: true
+schema: 
+  - http://localhost:4000/graphql:
+      headers:
+        Authorization: 'Bearer <INSERT_AUTH_TOKEN_HERE>'
+documents: "src/graphql/**/*.graphql"
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
