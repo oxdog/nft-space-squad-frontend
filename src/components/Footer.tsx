@@ -14,12 +14,8 @@ type LinkEntry = {
 export const Footer: React.FC<FooterProps> = () => {
   const navigation = {
     main: [
-      { name: 'company.at', href: 'https://company.at' },
-      {
-        name: 'Developer Jobs in Österreich',
-        href: 'https://company.at/jobs',
-      },
-      { name: 'Impressum', href: 'https://company.at/page/impressum' },
+      { name: 'company.at', href: 'https://company.io' },
+      { name: 'Impressum', href: 'https://company.io/impressum' },
     ],
     social: [
       // {
